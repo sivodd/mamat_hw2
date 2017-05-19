@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "list.h"
 
-PList ListCreate(void* cloneFunc, Result destroyFunc, Result compareFunc, void* printFunc)
+PList ListCreate(CLONE_FUNC cloneFunc, DESTROY_FUNC destroyFunc, COMPARE_FUNC compareFunc, PRINT_FUNC printFunc)
 {
 	PList Plist = (PList)malloc(sizeof(List));
 	if (Plist != NULL)
@@ -10,10 +10,10 @@ PList ListCreate(void* cloneFunc, Result destroyFunc, Result compareFunc, void* 
 		Plist->head = NULL;
 		Plist->tail = NULL;
 		Plist->iterator = NULL;
-		Plist->CLONE_FUNC = cloneFunc;
-		Plist->DESTROY_FUNC = destroyFunc;
-		Plist->COMPARE_FUNC = compareFunc;
-		Plist->PRINT_FUNC = printFunc;
+		Plist->CloneFunc = cloneFunc;
+		Plist->DestroyFunc = destroyFunc;
+		Plist->CompareFunc = compareFunc;
+		Plist->PrintFunc = printFunc;
 	}
 	return Plist;
 }
@@ -23,7 +23,7 @@ void ListDestroy(PList list)
 	PNode cur_node = ListGetFirst(list);
 	while (cur_node!=NULL)
 	{
-		list->DESTROY_FUNC(cur_node->Pobject);
+		list->DestroyFunc(cur_node->Pobject);
 		PNode temp = ListGetNext(list);
 		free(cur_node);
 		cur_node = temp;
@@ -34,7 +34,7 @@ void ListDestroy(PList list)
 Result ListAdd(PList list, void* new_object)
 {
 	PNode new_node = (PNode)malloc(sizeof(Node));
-	void* object = list->CLONE_FUNC(new_object);
+	void* object = list->CloneFunc(new_object);
 	if (new_node == NULL || object == NULL)
 	{
 		free(new_node);
@@ -42,10 +42,14 @@ Result ListAdd(PList list, void* new_object)
 		return FAIL;
 	}
 	new_node->Pobject = object;
+	new_node->next = NULL;
 	if (list->tail == NULL)//if its the first object
 		list->tail = list->head = new_node;
 	else
-		((PNode)(list->tail))->next = list->tail =  new_node;
+	{
+		((PNode)(list->tail))->next = new_node;
+		list->tail = new_node;
+	}
 	return SUCCESS;
 }
 
@@ -54,7 +58,7 @@ Result ListRemove(PList list, void* object)
 	//Transfer the iterators to the first object
 	void* cur_object = ListGetFirst(list);
 	//serching the object in the list
-	while (cur_object != NULL && !list->COMPARE_FUNC(object, cur_object))
+	while (cur_object != NULL && !list->CompareFunc(object, cur_object))
 	{
 		cur_object = ListGetNext(list);
 	}
@@ -71,13 +75,15 @@ Result ListRemove(PList list, void* object)
 	return FAIL;
 }
 
-PNode ListGetFirst(PList list)
+void* ListGetFirst(PList list)
 {
 	list->iterator = list->head;
+	if (list->iterator == NULL)
+		return NULL;
 	return ((PNode)(list->head))->Pobject;
 }
 
-PNode ListGetNext(PList list)
+void* ListGetNext(PList list)
 {
 	if (list->iterator == NULL || ((PNode)(list->iterator))->next == NULL)
 	{
@@ -91,14 +97,14 @@ PNode ListGetNext(PList list)
 BOOL ListCompare(PList list1, PList list2)
 {
 	//Transfer the iterators to the first object and compare the first objects
-	if (!list1->COMPARE_FUNC(ListGetFirst(list1), ListGetFirst(list2)))
+	if (!list1->CompareFunc(ListGetFirst(list1), ListGetFirst(list2)))
 		return FALSE;
 	//iterate over the lists and compare the objects;
 	while (ListGetNext(list1)!=NULL && ListGetNext(list2)!=NULL)
 	{
 		void* object1 = ((PNode)(list1->iterator))->Pobject;
 		void* object2 = ((PNode)(list2->iterator))->Pobject;
-		if (!list1->COMPARE_FUNC(object1, object2))
+		if (!list1->CompareFunc(object1, object2))
 			return FALSE;
 	}
 	return TRUE;
@@ -106,11 +112,11 @@ BOOL ListCompare(PList list1, PList list2)
 
 void ListPrint(PList list)
 {
-	PNode cur_node = ListGetFirst(list);
-	while (cur_node!=NULL)
+	void* cur_object = ListGetFirst(list);
+	while (cur_object !=NULL)
 	{
-		list->PRINT_FUNC(cur_node->Pobject);
-		cur_node = ListGetNext(list);
+		list->PrintFunc(cur_object);
+		cur_object = ListGetNext(list);
 	}
 	printf("\n");
 }
