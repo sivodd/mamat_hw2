@@ -1,28 +1,37 @@
 #ifndef _LIST_H_
 #define _LIST_H_
 #include "defs.h"
+#include "person.h"
+/*type defintions*/
+typedef void* Pobject;
+
+/*Function tpes*/
+typedef void* (*CLONE_FUNC)(Pobject);
+typedef void (*DESTROY_FUNC)(Pobject);
+typedef Result (*COMPARE_FUNC)(Pobject, Pobject);
+typedef void* (*PRINT_FUNC)(Pobject);
+
+typedef struct Node {
+	void* Pobject;
+	struct Node* next;
+}Node, *PNode;
 
 typedef struct List{
 	PNode iterator;
 	void* head;
 	void* tail;
-	void* (*CLONE_FUNC)(void*);
-	Result (*DESTROY_FUNC)(void*);
-	Result (*COMPARE_FUNC)(void*, void*);
-	void* (*PRINT_FUNC)(void*);
+	CLONE_FUNC CloneFunc;
+	DESTROY_FUNC DestroyFunc;
+	COMPARE_FUNC CompareFunc;
+	PRINT_FUNC PrintFunc;
 } List, *PList;
 
-typedef struct Node{
-	void* Pobject;
-	struct Node* next;
-}Node, *PNode;
-
-PList ListCreate(void* clonaFunc, Result destroyFunc, Result compareFunc, void* printFunc);
+PList ListCreate(CLONE_FUNC cloneFunc, DESTROY_FUNC destroyFunc, COMPARE_FUNC compareFunc, PRINT_FUNC printFunc);
 void ListDestroy(PList list);
 Result ListAdd(PList list, void* new_object);
 Result ListRemove(PList list, void* node);
-PNode ListGetFirst(PList list);
-PNode ListGetNext(PList list);
+void* ListGetFirst(PList list);
+void* ListGetNext(PList list);
 BOOL ListCompare(PList list1, PList list2);
 void ListPrint(PList list);
 
