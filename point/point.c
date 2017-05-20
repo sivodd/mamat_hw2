@@ -180,7 +180,9 @@ BOOL PointCompare(PPoint pPoint1, PPoint pPoint2){
 //* Parameters    : pPoint1 / pPoint2 - pointers to the points we want to measure.
 //* Return value  : Distance number - how far they are from each other.
 //*************************************************************************************
+
 int PointDistance(PPoint pPoint1, PPoint pPoint2){ //maybe we should use a static here
+
 //    make sure this function can't get empty points/
     int result=0;
     int coor_value=0;
