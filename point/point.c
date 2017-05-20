@@ -12,21 +12,48 @@
 //    return new_pCoordinate;
 //}
 
+//*************************************************************************************
+//* Function name : CoordinateDestroy
+//* Description   : Given a pointer it will free the mem to the coordinate.
+//* Parameters    : pCoordinate - a pointer to a coordinate.
+//* Return value  : None.
+//*************************************************************************************
 void CoordinateDestroy(PCoordinate pCoordinate){
     free(pCoordinate);
 }
+
+//*************************************************************************************
+//* Function name : CoordinateCompare
+//* Description   : Given two pointers it will compare both coordinate's values and will
+//                  return TRUE if they are the same and FALSE otherwise.
+//* Parameters    : pCoordinate1 / pCoordinate12 - a pointer to the coordinates we want
+//                  to compare.
+//* Return value  : TRUE / FALSE.
+//*************************************************************************************
 BOOL CoordinateCompare(PCoordinate pCoordinate1, PCoordinate pCoordinate2){
     if (pCoordinate1->coordinate_value==pCoordinate2->coordinate_value)
         return TRUE;
     else return FALSE;
 }
 
+//*************************************************************************************
+//* Function name : CoordinatePrint
+//* Description   : Given a pointer it will print the value of the coordinate.
+//* Parameters    : pCoordinate - a pointer to a coordinate.
+//* Return value  : None.
+//*************************************************************************************
 void CoordinatePrint(PCoordinate pCoordinate){
     printf("%d ", pCoordinate->coordinate_value);
 }
 
-
-void* PointCreate(int dimension){
+//*************************************************************************************
+//* Function name : PointCreate
+//* Description   : Given a dimension size it will create a point struct of that
+//                  dimension.
+//* Parameters    : dimension_size - a dimension of a point.
+//* Return value  : PPoint - A Pointer to a point.
+//*************************************************************************************
+PPoint PointCreate(int dimension){
     PPoint pPoint=(PPoint)malloc(sizeof(Point));
     if (pPoint==NULL)
         return NULL;
@@ -38,11 +65,25 @@ void* PointCreate(int dimension){
     return pPoint;
 }
 
+//*************************************************************************************
+//* Function name : PointDestroy
+//* Description   : Given a pointer it will free the mem of the point struct.
+//* Parameters    : pPoint - a pointer to a point.
+//* Return value  : None.
+//*************************************************************************************
 void PointDestroy(PPoint pPoint){
     ListDestroy(pPoint->coordinate_list);
     free(pPoint);
 }
 
+//*************************************************************************************
+//* Function name : PointAddCoordinate
+//* Description   : Given a pointer and a coordinate value it will add a new coordinate
+//                  to the point's coordinate list
+//* Parameters    : pPoint - a pointer to a point.
+//                  coordinate - coordinate value.
+//* Return value  : FAIL / SUCCESS.
+//*************************************************************************************
 Result PointAddCoordinate(PPoint pPoint, int coordinate){
     if (pPoint->size==pPoint->dimension)
         return FAIL;
@@ -58,6 +99,13 @@ Result PointAddCoordinate(PPoint pPoint, int coordinate){
 
 }
 
+//*************************************************************************************
+//* Function name : PointGetFirstCoordinate
+//* Description   : Given a pointer to a point it will return the first coordinate.
+//                  if there isn't one it will return 0.
+//* Parameters    : pPoint - a pointer to a point.
+//* Return value  : coordinate value or 0 if there is no coordinate.
+//*************************************************************************************
 int PointGetFirstCoordinate(PPoint pPoint){
     PCoordinate first=ListGetFirst(pPoint->coordinate_list);
     if (first==NULL)
@@ -65,6 +113,13 @@ int PointGetFirstCoordinate(PPoint pPoint){
     else return first->coordinate_value;
 }
 
+//*************************************************************************************
+//* Function name : PointGetNextCoordinate
+//* Description   : Given a pointer to a point it will returns the next coordinate the
+//                  iterator is on. if there isn't one it will return 0.
+//* Parameters    : pPoint - a pointer to a point.
+//* Return value  : coordinate value or 0 if there is no coordinate.
+//*************************************************************************************
 int PointGetNextCoordinate(PPoint pPoint){
     PCoordinate next=ListGetNext(pPoint->coordinate_list);
     if (next==NULL)
@@ -72,13 +127,24 @@ int PointGetNextCoordinate(PPoint pPoint){
     else return next->coordinate_value;
 }
 
+//*************************************************************************************
+//* Function name : PrintPoint
+//* Description   : Print the point content given a pointer to the point.
+//* Parameters    : pPoint - a pointer to a point.
+//* Return value  : None.
+//*************************************************************************************
 void PointPrint(PPoint pPoint){
     int size=pPoint->size;
     int dim=pPoint->dimension;
     printf("Point Dimension: %d, Size: %d, Coordinates: ", dim ,size);
     ListPrint(pPoint->coordinate_list);
 }
-
+//*************************************************************************************
+//* Function name : PointClone
+//* Description   : Makes a clone to a Given a point.
+//* Parameters    : pPoint - a pointer to a point.
+//* Return value  : None.
+//*************************************************************************************
 PPoint PointClone(PPoint pPoint){
     PPoint new_pPoint=PointCreate(pPoint->dimension);
     if (new_pPoint == NULL)
@@ -95,13 +161,25 @@ PPoint PointClone(PPoint pPoint){
     return new_pPoint;
 }
 
+//*************************************************************************************
+//* Function name : PointCompare
+//* Description   : Compers the two points. returns TRUE if they are the same and FALSE
+//                  otherwise.
+//* Parameters    : pPoint1 / pPoint2 - pointers to the points we want to compare.
+//* Return value  : TRUE / FALSE.
+//*************************************************************************************
 BOOL PointCompare(PPoint pPoint1, PPoint pPoint2){
     if (ListCompare(pPoint1->coordinate_list,pPoint2->coordinate_list))
         return TRUE;
     else return FALSE;
 }
 
-
+//*************************************************************************************
+//* Function name : PointDistance
+//* Description   : Calculates the distance between twa given points.
+//* Parameters    : pPoint1 / pPoint2 - pointers to the points we want to measure.
+//* Return value  : Distance number - how far they are from each other.
+//*************************************************************************************
 int PointDistance(PPoint pPoint1, PPoint pPoint2){
 //    make sure this function can't get empty points/
     int i=0;
@@ -113,6 +191,5 @@ int PointDistance(PPoint pPoint1, PPoint pPoint2){
         result_arr[i]=pow((PointGetNextCoordinate(pPoint1)-PointGetNextCoordinate(pPoint2)),2);
         sum+=(int)result_arr[i];
     }
-
     return sum;
 }
