@@ -20,13 +20,16 @@ PList ListCreate(CLONE_FUNC cloneFunc, DESTROY_FUNC destroyFunc, COMPARE_FUNC co
 
 void ListDestroy(PList list)
 {
-	PNode cur_node = ListGetFirst(list);
-	while (cur_node!=NULL)
+	Node* temp  = NULL;
+	//tranfer the iterator to the begining of the list 
+	void* cur_object = ListGetFirst(list);
+	//iterate the list and free all the nodes and objects
+	while (list->iterator!=NULL)
 	{
-		list->DestroyFunc(cur_node->Pobject);
-		PNode temp = ListGetNext(list);
-		free(cur_node);
-		cur_node = temp;
+		list->DestroyFunc(cur_object);
+		temp = list->iterator;
+		cur_object = ListGetNext(list);
+		free(temp);
 	}
 	free(list);
 }
@@ -35,13 +38,16 @@ Result ListAdd(PList list, void* new_object)
 {
 	PNode new_node = (PNode)malloc(sizeof(Node));
 	void* object = list->CloneFunc(new_object);
+	//if one of the alloc not succeeded
 	if (new_node == NULL || object == NULL)
 	{
 		free(new_node);
 		free(object);
 		return FAIL;
 	}
+	//attaching the object to the node
 	new_node->Pobject = object;
+	//adding the node to the list
 	new_node->next = NULL;
 	if (list->tail == NULL)//if its the first object
 		list->tail = list->head = new_node;
@@ -57,18 +63,30 @@ Result ListRemove(PList list, void* object)
 {
 	//Transfer the iterators to the first object
 	void* cur_object = ListGetFirst(list);
+	Node* pre_node = NULL;
 	//serching the object in the list
 	while (cur_object != NULL && !list->CompareFunc(object, cur_object))
 	{
+		pre_node = list->iterator;
 		cur_object = ListGetNext(list);
 	}
 	//If the object is found
 	if (cur_object != NULL)
 	{
-		free(cur_object);
-		PNode temp = ((PNode)(list->iterator))->next;
-		free(list->iterator);
-		list->iterator = temp;
+		list->DestroyFunc(cur_object); 
+		//if its the first object
+		if (pre_node==NULL)
+			list->head = ((PNode)(list->iterator))->next;
+		//if its not the first object
+		else
+			pre_node->next = ((PNode)(list->iterator))->next;
+		//if its the last object
+		if (((PNode)(list->iterator))->next == NULL)
+			list->tail = pre_node;
+		//free the node and rearrange the list
+		Node* temp = list->iterator;
+		list->iterator = ((Node*)(list->iterator))->next;
+		free(temp);
 		return SUCCESS;
 	}
 	//If the object is not found
