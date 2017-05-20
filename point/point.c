@@ -180,16 +180,25 @@ BOOL PointCompare(PPoint pPoint1, PPoint pPoint2){
 //* Parameters    : pPoint1 / pPoint2 - pointers to the points we want to measure.
 //* Return value  : Distance number - how far they are from each other.
 //*************************************************************************************
-int PointDistance(PPoint pPoint1, PPoint pPoint2){
+
+int PointDistance(PPoint pPoint1, PPoint pPoint2){ //maybe we should use a static here
+
 //    make sure this function can't get empty points/
-    int i=0;
-    int sum=0;
-    double result_arr[pPoint1->dimension]={0};
-    result_arr[0]=pow((PointGetFirstCoordinate(pPoint1)-PointGetFirstCoordinate(pPoint2)),2);
-    sum=(int)result_arr[0];
-    for (i=1;i<pPoint1->dimension;i++){
-        result_arr[i]=pow((PointGetNextCoordinate(pPoint1)-PointGetNextCoordinate(pPoint2)),2);
-        sum+=(int)result_arr[i];
+    int result=0;
+    int coor_value=0;
+    PPoint result_point=PointCreate(pPoint1->dimension);
+    if (result_point==NULL)
+        return NULL;
+    coor_value=PointGetFirstCoordinate(pPoint1);
+    if (coor_value==0)
+        return NULL; //if there a point is empty will not get distance.
+    result=(int)pow((PointGetFirstCoordinate(pPoint1)-PointGetFirstCoordinate(pPoint2)),2);
+    while (coor_value!=0){
+        if (PointAddCoordinate(result_point, result)==FAIL)
+            return NULL;
+        result+=(int)pow((PointGetNextCoordinate(pPoint1)-PointGetNextCoordinate(pPoint2)),2);
+        coor_value=((PCoordinate)(pPoint1->coordinate_list->iterator->Pobject))->coordinate_value;
     }
-    return sum;
+    free(result_point);
+    return result;
 }
