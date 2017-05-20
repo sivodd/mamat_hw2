@@ -10,7 +10,6 @@ typedef struct cluster{
 
 void PointDestroy(PPoint);
 void PointPrint(PPoint);
-
 PCluster ClusterCreate(int dimension);
 void ClusterDestroy(PCluster pCluster);
 Result ClusterAddPoint(PCluster pCluster, PPoint pPoint);

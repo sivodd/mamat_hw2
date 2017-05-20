@@ -3,7 +3,15 @@
 #include <math.h>
 #include "point.h"
 
-//void CoordinateClone(PCoordinate pCoordinate)
+// i use this already in PointAddList
+// PCoordinate CoordinateClone(PCoordinate pCoordinate){
+//    PCoordinate new_pCoordinate=(PCoordinate)malloc(sizeof(Coordinate));
+//    if (new_pCoordinate == NULL)
+//        return NULL;
+//    new_pCoordinate->coordinate_value=pCoordinate->coordinate_value;
+//    return new_pCoordinate;
+//}
+
 void CoordinateDestroy(PCoordinate pCoordinate){
     free(pCoordinate);
 }
@@ -43,7 +51,10 @@ Result PointAddCoordinate(PPoint pPoint, int coordinate){
         return FAIL;
     pCoordinate->coordinate_value=coordinate;
     ListAdd(pPoint->coordinate_list,pCoordinate);
+    if (ListAdd(pPoint->coordinate_list,pCoordinate)==FAIL)
+        return FAIL;
     pPoint->size++;
+    return SUCCESS;
 
 }
 
@@ -68,7 +79,21 @@ void PointPrint(PPoint pPoint){
     ListPrint(pPoint->coordinate_list);
 }
 
-PPoint ClonePoint(PPoint pPoint);
+PPoint PointClone(PPoint pPoint){
+    PPoint new_pPoint=PointCreate(pPoint->dimension);
+    if (new_pPoint == NULL)
+        return NULL;
+    new_pPoint->size=pPoint->size;
+    new_pPoint->coordinate_list=pPoint->coordinate_list;
+    int curr_coor=PointGetFirstCoordinate(pPoint);
+    while (curr_coor!=0){
+        PointAddCoordinate(new_pPoint, curr_coor);
+        if (PointAddCoordinate(new_pPoint, curr_coor)==NULL)
+            return NULL;
+        curr_coor=PointGetNextCoordinate(pPoint);
+    }
+    return new_pPoint;
+}
 
 BOOL PointCompare(PPoint pPoint1, PPoint pPoint2){
     if (ListCompare(pPoint1->coordinate_list,pPoint2->coordinate_list))

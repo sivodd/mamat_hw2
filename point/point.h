@@ -15,7 +15,7 @@ typedef struct coordinate{
 }Coordinate, *PCoordinate;
 
 
-//void CoordinateClone(PCoordinate pCoordinate);
+PCoordinate CoordinateClone(PCoordinate pCoordinate);
 void CoordinateDestroy(PCoordinate pCoordinate);
 BOOL CoordinateCompare(PCoordinate pCoordinate1, PCoordinate pCoordinate2);
 void CoordinatePrint(PCoordinate pCoordinate);
