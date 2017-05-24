@@ -6,7 +6,8 @@ PList ListCreate(CLONE_FUNC cloneFunc, DESTROY_FUNC destroyFunc, COMPARE_FUNC co
 	PList Plist = (PList)malloc(sizeof(List));
 	if (Plist != NULL)
 	{
-		PNode iterator = NULL;
+		Plist->iterator = NULL;
+//        sivan- changed this to also be Plist->iterator
 		Plist->head = NULL;
 		Plist->tail = NULL;
 		Plist->iterator = NULL;
@@ -23,20 +24,21 @@ void ListDestroy(PList list)
 	PNode cur_node = ListGetFirst(list);
 	while (cur_node!=NULL)
 	{
-		list->DestroyFunc(cur_node->Pobject);
-		PNode temp = ListGetNext(list);
+        PNode temp = ListGetNext(list);
+        list->DestroyFunc(cur_node->Pobject);
 		free(cur_node);
 		cur_node = temp;
 	}
 	free(list);
 }
 
-Result ListAdd(PList list, void* new_object)
+Result ListAdd(PList list, void* added_object)
 {
 	PNode new_node = (PNode)malloc(sizeof(Node));
-	void* object = list->CloneFunc(new_object);
+	void* object = list->CloneFunc(added_object);
 	if (new_node == NULL || object == NULL)
 	{
+//		not sure you can free null maybe change this to two different if's //sivan
 		free(new_node);
 		free(object);
 		return FAIL;
@@ -57,7 +59,7 @@ Result ListRemove(PList list, void* object)
 {
 	//Transfer the iterators to the first object
 	void* cur_object = ListGetFirst(list);
-	//serching the object in the list
+	//searching the object in the list
 	while (cur_object != NULL && !list->CompareFunc(object, cur_object))
 	{
 		cur_object = ListGetNext(list);

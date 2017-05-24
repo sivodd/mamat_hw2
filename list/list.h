@@ -1,14 +1,18 @@
 #ifndef _LIST_H_
 #define _LIST_H_
+
+#include <stdlib.h>
 #include "defs.h"
-#include "person.h"
-/*type defintions*/
+
+
+
+//*type defintions*//
 typedef void* Pobject;
 
-/*Function tpes*/
+//*Function types*//
 typedef void* (*CLONE_FUNC)(Pobject);
 typedef void (*DESTROY_FUNC)(Pobject);
-typedef Result (*COMPARE_FUNC)(Pobject, Pobject);
+typedef BOOL (*COMPARE_FUNC)(Pobject, Pobject);
 typedef void* (*PRINT_FUNC)(Pobject);
 
 typedef struct Node {
