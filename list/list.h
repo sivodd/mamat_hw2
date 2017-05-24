@@ -38,5 +38,6 @@ void* ListGetFirst(PList list);
 void* ListGetNext(PList list);
 BOOL ListCompare(PList list1, PList list2);
 void ListPrint(PList list);
+void deleteNode(PList list, Node* node);
 
 #endif

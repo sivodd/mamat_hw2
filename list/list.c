@@ -21,13 +21,16 @@ PList ListCreate(CLONE_FUNC cloneFunc, DESTROY_FUNC destroyFunc, COMPARE_FUNC co
 
 void ListDestroy(PList list)
 {
-	PNode cur_node = ListGetFirst(list);
-	while (cur_node!=NULL)
+	Node* temp  = NULL;
+	//tranfer the iterator to the begining of the list 
+	void* cur_object = ListGetFirst(list);
+	//iterate the list and free all the nodes and objects
+	while (list->iterator!=NULL)
 	{
-        PNode temp = ListGetNext(list);
-        list->DestroyFunc(cur_node->Pobject);
-		free(cur_node);
-		cur_node = temp;
+		list->DestroyFunc(cur_object);
+		temp = list->iterator;
+		cur_object = ListGetNext(list);
+		free(temp);
 	}
 	free(list);
 }
@@ -35,7 +38,8 @@ void ListDestroy(PList list)
 Result ListAdd(PList list, void* added_object)
 {
 	PNode new_node = (PNode)malloc(sizeof(Node));
-	void* object = list->CloneFunc(added_object);
+	void* object = list->CloneFunc(new_object);
+	//if one of the alloc not succeeded
 	if (new_node == NULL || object == NULL)
 	{
 //		not sure you can free null maybe change this to two different if's //sivan
@@ -43,7 +47,9 @@ Result ListAdd(PList list, void* added_object)
 		free(object);
 		return FAIL;
 	}
+	//attaching the object to the node
 	new_node->Pobject = object;
+	//adding the node to the list
 	new_node->next = NULL;
 	if (list->tail == NULL)//if its the first object
 		list->tail = list->head = new_node;
@@ -59,18 +65,18 @@ Result ListRemove(PList list, void* object)
 {
 	//Transfer the iterators to the first object
 	void* cur_object = ListGetFirst(list);
-	//searching the object in the list
+	//Node* pre_node = NULL;
+	//serching the object in the list
 	while (cur_object != NULL && !list->CompareFunc(object, cur_object))
 	{
+		//pre_node = list->iterator;
 		cur_object = ListGetNext(list);
 	}
 	//If the object is found
 	if (cur_object != NULL)
 	{
-		free(cur_object);
-		PNode temp = ((PNode)(list->iterator))->next;
-		free(list->iterator);
-		list->iterator = temp;
+		list->DestroyFunc(cur_object); 
+		
 		return SUCCESS;
 	}
 	//If the object is not found
@@ -121,4 +127,29 @@ void ListPrint(PList list)
 		cur_object = ListGetNext(list);
 	}
 	printf("\n");
+}
+
+void deleteNode(PList list, Node* node)
+{
+	Node* pre_node = NULL;
+	Node* cur_node = list->head;
+	while (cur_node!=node)
+	{
+		pre_node = cur_node;
+		cur_node = cur_node->next;
+	}
+	//if its the first object
+	if (pre_node == NULL)
+		list->head = cur_node->next;
+	//if its not the first object
+	else
+		pre_node->next = cur_node->next;
+	//if its the last object
+	if (cur_node->next == NULL)
+		list->tail = pre_node;
+	//if the iterator pointing to the node that going to be deleted
+	if (cur_node = list->iterator)
+		list->iterator = cur_node->next;
+	//free the node 
+	free(cur_node);
 }
