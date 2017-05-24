@@ -75,8 +75,8 @@ PPoint PointCreate(int dimension){
 //* Return value  : None.
 //*************************************************************************************
 void PointDestroy(PPoint pPoint){
-    ListDestroy(pPoint->coordinate_list);
-    free(pPoint);
+    if (pPoint!=NULL)
+        free(pPoint);
 }
 
 //*************************************************************************************
@@ -98,6 +98,7 @@ Result PointAddCoordinate(PPoint pPoint, int coordinate){
     pCoordinate->coordinate_value=coordinate;
     if (ListAdd(pPoint->coordinate_list,pCoordinate)==FAIL)
         return FAIL;
+    free(pCoordinate);
 //  update the point size
     pPoint->size++;
     return SUCCESS;
@@ -151,24 +152,13 @@ void PointPrint(PPoint pPoint){
 //* Return value  : None.
 //*************************************************************************************
 PPoint PointClone(PPoint pPoint){
-//  creating memory for a new point where we will copy the old point to.
-    PPoint new_pPoint=PointCreate(pPoint->dimension);
+    PPoint new_pPoint=(PPoint)malloc(sizeof(Point));
     if (new_pPoint == NULL)
         return NULL;
-//  assigning the new points values
+//  assigning all pPoint values to the new point
     new_pPoint->size=pPoint->size;
     new_pPoint->coordinate_list=pPoint->coordinate_list;
-    int curr_coor=PointGetFirstCoordinate(pPoint);
-    int new_size=1;
-//  copy all coordinates until we get to the point size meaning we copied all coordinates
-    while (new_size < pPoint->size){
-        PointAddCoordinate(new_pPoint, curr_coor);
-        if (PointAddCoordinate(new_pPoint, curr_coor)==NULL)
-            return NULL;
-//      moving the current coordinate to the next pPoint coordinate so it can be copied.
-        curr_coor=PointGetNextCoordinate(pPoint);
-        new_size++;
-    }
+    new_pPoint->dimension=pPoint->dimension;
     return new_pPoint;
 }
 
@@ -199,13 +189,14 @@ int PointDistance(PPoint pPoint1, PPoint pPoint2){
     int result=0;
     int size=0;
 //  ??? do we need to use coor_value=0??? coor_value=PointGetFirstCoordinate(pPoint1);
-    if (pPoint1->size==0)
-        return NULL; //if the point is empty will not get distance.
+    if (pPoint1->size==0 || PointCompare(pPoint1,pPoint2))
+        return 0; //if the point is empty will not get distance.
     result=(int)pow((PointGetFirstCoordinate(pPoint1)-PointGetFirstCoordinate(pPoint2)),2);
     size=1;
 //  make sure we did'nt get to the end of the point
     while (size<pPoint1->size){
         result+=(int)pow((PointGetNextCoordinate(pPoint1)-PointGetNextCoordinate(pPoint2)),2);
+        size++;
     }
 
     return result;

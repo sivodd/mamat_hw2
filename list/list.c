@@ -6,7 +6,8 @@ PList ListCreate(CLONE_FUNC cloneFunc, DESTROY_FUNC destroyFunc, COMPARE_FUNC co
 	PList Plist = (PList)malloc(sizeof(List));
 	if (Plist != NULL)
 	{
-		PNode iterator = NULL;
+		Plist->iterator = NULL;
+//        sivan- changed this to also be Plist->iterator
 		Plist->head = NULL;
 		Plist->tail = NULL;
 		Plist->iterator = NULL;
@@ -34,13 +35,14 @@ void ListDestroy(PList list)
 	free(list);
 }
 
-Result ListAdd(PList list, void* new_object)
+Result ListAdd(PList list, void* added_object)
 {
 	PNode new_node = (PNode)malloc(sizeof(Node));
 	void* object = list->CloneFunc(new_object);
 	//if one of the alloc not succeeded
 	if (new_node == NULL || object == NULL)
 	{
+//		not sure you can free null maybe change this to two different if's //sivan
 		free(new_node);
 		free(object);
 		return FAIL;

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <limits.h>
 #include "cluster.h"
 
 //*************************************************************************************
@@ -13,6 +14,7 @@ PCluster ClusterCreate(int dimension){
     PCluster pCluster=(PCluster)malloc(sizeof(Cluster));
     if (pCluster==NULL)
         return NULL;
+//  assigning all of Cluster's parameters and creating a list for points
     pCluster->dimension=dimension;
     pCluster->point_list= ListCreate(PointClone, PointDestroy, PointCompare, PointPrint);
     if (pCluster->point_list==NULL)
@@ -42,16 +44,13 @@ Result ClusterAddPoint(PCluster pCluster, PPoint pPoint){
     if (pPoint->dimension!=pCluster->dimension)
         return FAIL;
     PPoint pPoint_curr=ListGetFirst(pCluster->point_list);
-//    check if the point already exists in the cluster if so return fail.
+//  check if the point already exists in the cluster if so return fail.
     while(pPoint_curr!=NULL){
         if (ListCompare(pPoint_curr->coordinate_list, pPoint->coordinate_list))
             return FAIL;
-        else ListGetNext(pCluster->point_list);
+        else pPoint_curr=ListGetNext(pCluster->point_list);
     }
-//    put this in a comment because i think that add list dose this cloning.
-//    PPoint new_point=PointClone(pPoint);
-//    if (new_point==NULL)
-//    return FAIL;
+//  add pPoint to the end of the cluster.
     ListAdd(pCluster->point_list,pPoint);
     return SUCCESS;
 }
@@ -64,14 +63,14 @@ Result ClusterAddPoint(PCluster pCluster, PPoint pPoint){
 //* Return value  : minimum distance - number.
 //*************************************************************************************
 int ClusterGetMinDistance(PCluster pCluster, PPoint pPoint){
-    int min_d=INFINITY;
+    int min_d=INT_MAX;
     int d=0;
     PPoint pPoint_curr=ListGetFirst(pCluster->point_list);
-//    loop on all points in cluster.
+//  iterates on all points in cluster.
     while (pPoint_curr!=NULL){
         d=PointDistance(pPoint_curr, pPoint);
         //if the distance is smaller then the min distance and the point in the cluster
-        // is no the same as pPoint
+        // and is not the same as pPoint
         if (d<min_d && d!=0)
             min_d=d;
         pPoint_curr=ListGetNext(pCluster->point_list);
@@ -86,14 +85,15 @@ int ClusterGetMinDistance(PCluster pCluster, PPoint pPoint){
 //* Return value  : None.
 //*************************************************************************************
 void ClusterPrint(PCluster pCluster){
-    int MinSqDist=INFINITY;
+    int MinSqDist=INT_MAX;
     int d=0;
     PPoint pPoint_curr=ListGetFirst(pCluster->point_list);
 //  iter_temp will save the pointer to the iterator before we use a function that will move the iterator so
-//  we can go back to starting point.
+//  we can have every point compared with the whole list
     PNode iter_tmp=pCluster->point_list->iterator;
-    while (pPoint_curr!=NULL){
-//      find the minimum distance between the current poin and the rest of the cluster.
+//  check that we didn't get to the end of the list and that the list has more then 1 point.
+    while (pPoint_curr!=NULL && pCluster->point_list->head!=pCluster->point_list->tail){
+//      find the minimum distance between the current point and the rest of the cluster.
         d=ClusterGetMinDistance(pCluster, pPoint_curr);
         if (d<MinSqDist)
             MinSqDist=d;
@@ -105,5 +105,8 @@ void ClusterPrint(PCluster pCluster){
 //  printing cluster's dimension, cluster's points and the minimum square distance.
     printf("Cluster's dimension: %d\n", pCluster->dimension);
     ListPrint(pCluster->point_list);
-    printf("\n\nMinimum Square Distance: %d", MinSqDist);
+    if (d==0){
+        printf("Minimum Square Distance: 0 (erase later -there is only one point or none)\n");
+    }
+    else printf("Minimum Square Distance: %d\n", MinSqDist);
 }
