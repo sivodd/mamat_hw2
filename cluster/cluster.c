@@ -42,15 +42,17 @@ Result ClusterAddPoint(PCluster pCluster, PPoint pPoint){
     if (pPoint->dimension!=pCluster->dimension)
         return FAIL;
     PPoint pPoint_curr=ListGetFirst(pCluster->point_list);
+//    check if the point already exists in the cluster if so return fail.
     while(pPoint_curr!=NULL){
         if (ListCompare(pPoint_curr->coordinate_list, pPoint->coordinate_list))
             return FAIL;
         else ListGetNext(pCluster->point_list);
     }
-    PPoint new_point=PointClone(pPoint);
-    if (new_point==NULL)
-        return FAIL;
-    ListAdd(pCluster->point_list,new_point);
+//    put this in a comment because i think that add list dose this cloning.
+//    PPoint new_point=PointClone(pPoint);
+//    if (new_point==NULL)
+//    return FAIL;
+    ListAdd(pCluster->point_list,pPoint);
     return SUCCESS;
 }
 
@@ -65,9 +67,12 @@ int ClusterGetMinDistance(PCluster pCluster, PPoint pPoint){
     int min_d=INFINITY;
     int d=0;
     PPoint pPoint_curr=ListGetFirst(pCluster->point_list);
+//    loop on all points in cluster.
     while (pPoint_curr!=NULL){
         d=PointDistance(pPoint_curr, pPoint);
-        if (d<min_d && d!=0) //check that it dose'nt measure dist from it self.
+        //if the distance is smaller then the min distance and the point in the cluster
+        // is no the same as pPoint
+        if (d<min_d && d!=0)
             min_d=d;
         pPoint_curr=ListGetNext(pCluster->point_list);
     }
@@ -84,15 +89,20 @@ void ClusterPrint(PCluster pCluster){
     int MinSqDist=INFINITY;
     int d=0;
     PPoint pPoint_curr=ListGetFirst(pCluster->point_list);
+//  iter_temp will save the pointer to the iterator before we use a function that will move the iterator so
+//  we can go back to starting point.
     PNode iter_tmp=pCluster->point_list->iterator;
     while (pPoint_curr!=NULL){
+//      find the minimum distance between the current poin and the rest of the cluster.
         d=ClusterGetMinDistance(pCluster, pPoint_curr);
         if (d<MinSqDist)
             MinSqDist=d;
+//      move the list iterator back to where current point is so we can find the next point in the list.
         pCluster->point_list->iterator=iter_tmp;
         pPoint_curr=ListGetNext(pCluster->point_list);
         iter_tmp=iter_tmp->next;
         }
+//  printing cluster's dimension, cluster's points and the minimum square distance.
     printf("Cluster's dimension: %d\n", pCluster->dimension);
     ListPrint(pCluster->point_list);
     printf("\n\nMinimum Square Distance: %d", MinSqDist);
