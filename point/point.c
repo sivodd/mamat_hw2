@@ -4,11 +4,12 @@
 #include "point.h"
 
 // i use this already in PointAddList not sure what it's good for
- PCoordinate CoordinateClone(PCoordinate pCoordinate){
+ void* CoordinateClone(void* pCoordinate){
+	PCoordinate c_pCoordinate = (PCoordinate)pCoordinate;
     PCoordinate new_pCoordinate=(PCoordinate)malloc(sizeof(Coordinate));
     if (new_pCoordinate == NULL)
         return NULL;
-    new_pCoordinate->coordinate_value=pCoordinate->coordinate_value;
+    new_pCoordinate->coordinate_value=c_pCoordinate->coordinate_value;
     return new_pCoordinate;
 }
 
@@ -18,9 +19,10 @@
 //* Parameters    : pCoordinate - a pointer to a coordinate.
 //* Return value  : None.
 //*************************************************************************************
-void CoordinateDestroy(PCoordinate pCoordinate){
-    if (pCoordinate!=NULL)
-        free(pCoordinate);
+void CoordinateDestroy(void* pCoordinate){
+	PCoordinate c_pCoordinate = (PCoordinate)pCoordinate;
+    if (c_pCoordinate!=NULL)
+        free(c_pCoordinate);
 }
 
 //*************************************************************************************
@@ -31,8 +33,10 @@ void CoordinateDestroy(PCoordinate pCoordinate){
 //                  to compare.
 //* Return value  : TRUE / FALSE.
 //*************************************************************************************
-BOOL CoordinateCompare(PCoordinate pCoordinate1, PCoordinate pCoordinate2){
-    if (pCoordinate1->coordinate_value==pCoordinate2->coordinate_value)
+BOOL CoordinateCompare(void* pCoordinate1, void* pCoordinate2){
+	PCoordinate c_pCoordinate1 = (PCoordinate)pCoordinate1;
+	PCoordinate c_pCoordinate2 = (PCoordinate)pCoordinate2;
+	if (c_pCoordinate1->coordinate_value==c_pCoordinate2->coordinate_value)
         return TRUE;
     else return FALSE;
 }
@@ -43,8 +47,9 @@ BOOL CoordinateCompare(PCoordinate pCoordinate1, PCoordinate pCoordinate2){
 //* Parameters    : pCoordinate - a pointer to a coordinate.
 //* Return value  : None.
 //*************************************************************************************
-void CoordinatePrint(PCoordinate pCoordinate){
-    printf("%d ", pCoordinate->coordinate_value);
+void CoordinatePrint(void* pCoordinate){
+	PCoordinate c_pCoordinate = (PCoordinate)pCoordinate;
+    printf("%d ", c_pCoordinate->coordinate_value);
 }
 
 //*************************************************************************************
@@ -63,8 +68,11 @@ PPoint PointCreate(int dimension){
     pPoint->size=0;
     pPoint->coordinate_list= ListCreate(CoordinateClone, CoordinateDestroy, CoordinateCompare, CoordinatePrint);
 //  if the memory assignment fails
-    if (pPoint->coordinate_list==NULL)
-        return NULL;
+	if (pPoint->coordinate_list == NULL)
+	{
+		free(pPoint);
+		return NULL;
+	}
     return pPoint;
 }
 
@@ -74,9 +82,13 @@ PPoint PointCreate(int dimension){
 //* Parameters    : pPoint - a pointer to a point.
 //* Return value  : None.
 //*************************************************************************************
-void PointDestroy(PPoint pPoint){
-    if (pPoint!=NULL)
-        free(pPoint);
+void PointDestroy(void* pPoint){
+	PPoint c_pPoint = (PPoint)pPoint;
+	if (c_pPoint != NULL)
+	{
+		ListDestroy(c_pPoint->coordinate_list);
+		free(c_pPoint);	
+	}
 }
 
 //*************************************************************************************
@@ -89,15 +101,18 @@ void PointDestroy(PPoint pPoint){
 //*************************************************************************************
 Result PointAddCoordinate(PPoint pPoint, int coordinate){
 //  check if the point has the max amount of coordinates already
-    if (pPoint->size==pPoint->dimension)
-        return FAIL;
+	if (pPoint->size == pPoint->dimension)
+		return FAIL;
     PCoordinate pCoordinate=(PCoordinate)malloc(sizeof(Coordinate));
     if (pCoordinate==NULL)
         return FAIL;
 //  assigning the coordinates value and adding it to the list of the point
     pCoordinate->coordinate_value=coordinate;
-    if (ListAdd(pPoint->coordinate_list,pCoordinate)==FAIL)
-        return FAIL;
+	if (ListAdd(pPoint->coordinate_list, pCoordinate) == FAIL)
+	{
+		free(pCoordinate); //omer
+		return FAIL;
+	}
     free(pCoordinate);
 //  update the point size
     pPoint->size++;
@@ -139,11 +154,12 @@ int PointGetNextCoordinate(PPoint pPoint){
 //* Parameters    : pPoint - a pointer to a point.
 //* Return value  : None.
 //*************************************************************************************
-void PointPrint(PPoint pPoint){
-    int size=pPoint->size;
-    int dim=pPoint->dimension;
+void PointPrint(void* pPoint){
+	PPoint c_pPoint = (PPoint)pPoint;
+    int size=c_pPoint->size;
+    int dim=c_pPoint->dimension;
     printf("Point Dimension: %d, Size: %d, Coordinates: ", dim ,size);
-    ListPrint(pPoint->coordinate_list);
+    ListPrint(c_pPoint->coordinate_list);
 }
 //*************************************************************************************
 //* Function name : PointClone
@@ -151,14 +167,15 @@ void PointPrint(PPoint pPoint){
 //* Parameters    : pPoint - a pointer to a point.
 //* Return value  : None.
 //*************************************************************************************
-PPoint PointClone(PPoint pPoint){
+void* PointClone(void* pPoint){
+	PPoint c_pPoint = (PPoint)pPoint;
     PPoint new_pPoint=(PPoint)malloc(sizeof(Point));
     if (new_pPoint == NULL)
         return NULL;
 //  assigning all pPoint values to the new point
-    new_pPoint->size=pPoint->size;
-    new_pPoint->coordinate_list=pPoint->coordinate_list;
-    new_pPoint->dimension=pPoint->dimension;
+    new_pPoint->size=c_pPoint->size;
+    new_pPoint->coordinate_list=ListClone(c_pPoint->coordinate_list);
+    new_pPoint->dimension=c_pPoint->dimension;
     return new_pPoint;
 }
 
@@ -169,8 +186,10 @@ PPoint PointClone(PPoint pPoint){
 //* Parameters    : pPoint1 / pPoint2 - pointers to the points we want to compare.
 //* Return value  : TRUE / FALSE.
 //*************************************************************************************
-BOOL PointCompare(PPoint pPoint1, PPoint pPoint2){
-    if (ListCompare(pPoint1->coordinate_list,pPoint2->coordinate_list))
+BOOL PointCompare(void* pPoint1, void* pPoint2){
+	PPoint c_pPoint1 = (PPoint)pPoint1;
+	PPoint c_pPoint2 = (PPoint)pPoint2;
+    if (ListCompare(c_pPoint1->coordinate_list,c_pPoint2->coordinate_list))
         return TRUE;
     else return FALSE;
 }

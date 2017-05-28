@@ -3,6 +3,7 @@
 
 #include "defs.h"
 #include "list.h"
+#include <stdlib.h>
 
 typedef struct point{
     PList coordinate_list;
@@ -16,6 +17,7 @@ typedef struct coordinate{
 
 
 //PCoordinate CoordinateClone(PCoordinate pCoordinate);
+void* CoordinateClone(void* pCoordinate);
 
 //*************************************************************************************
 //* Function name : CoordinateDestroy
@@ -23,7 +25,7 @@ typedef struct coordinate{
 //* Parameters    : pCoordinate - a pointer to a coordinate.
 //* Return value  : None.
 //*************************************************************************************
-void CoordinateDestroy(PCoordinate pCoordinate);
+void CoordinateDestroy(void* pCoordinate);
 
 //*************************************************************************************
 //* Function name : CoordinateCompare
@@ -33,7 +35,7 @@ void CoordinateDestroy(PCoordinate pCoordinate);
 //                  to compare.
 //* Return value  : TRUE / FALSE.
 //*************************************************************************************
-BOOL CoordinateCompare(PCoordinate pCoordinate1, PCoordinate pCoordinate2);
+BOOL CoordinateCompare(void* pCoordinate1, void* pCoordinate2);
 
 //*************************************************************************************
 //* Function name : CoordinatePrint
@@ -41,7 +43,7 @@ BOOL CoordinateCompare(PCoordinate pCoordinate1, PCoordinate pCoordinate2);
 //* Parameters    : pCoordinate - a pointer to a coordinate.
 //* Return value  : None.
 //*************************************************************************************
-void CoordinatePrint(PCoordinate pCoordinate);
+void CoordinatePrint(void* pCoordinate);
 
 //*************************************************************************************
 //* Function name : PointCreate
@@ -58,7 +60,7 @@ PPoint PointCreate(int dimension_size);
 //* Parameters    : pPoint - a pointer to a point.
 //* Return value  : None.
 //*************************************************************************************
-void PointDestroy(PPoint pPoint);
+void PointDestroy(void* pPoint);
 
 //*************************************************************************************
 //* Function name : PointAddCoordinate
@@ -93,7 +95,7 @@ int PointGetNextCoordinate(PPoint pPoint);
 //* Parameters    : pPoint - a pointer to a point.
 //* Return value  : None.
 //*************************************************************************************
-void PointPrint(PPoint pPoint);
+void PointPrint(void* pPoint);
 
 //*************************************************************************************
 //* Function name : PointClone
@@ -101,7 +103,7 @@ void PointPrint(PPoint pPoint);
 //* Parameters    : pPoint - a pointer to a point.
 //* Return value  : None.
 //*************************************************************************************
-PPoint PointClone(PPoint pPoint);
+void* PointClone(void* pPoint);
 
 //*************************************************************************************
 //* Function name : PointCompare
@@ -110,7 +112,7 @@ PPoint PointClone(PPoint pPoint);
 //* Parameters    : pPoint1 / pPoint2 - pointers to the points we want to compare.
 //* Return value  : TRUE / FALSE.
 //*************************************************************************************
-BOOL PointCompare(PPoint pPoint1, PPoint pPoint2);
+BOOL PointCompare(void* pPoint1, void* pPoint2);
 
 //*************************************************************************************
 //* Function name : PointDistance
