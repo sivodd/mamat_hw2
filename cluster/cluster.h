@@ -1,5 +1,7 @@
 #ifndef _CLUSTER_H_
 #define _CLUSTER_H_
+#include <stdlib.h>  
+
 
 #include "point.h"
 
@@ -23,7 +25,7 @@ PCluster ClusterCreate(int dimension);
 //* Parameters    : pCluster - a pointer to a cluster.
 //* Return value  : None.
 //*************************************************************************************
-void ClusterDestroy(PCluster pCluster);
+void ClusterDestroy(void* pCluster);
 
 //*************************************************************************************
 //* Function name : ClusterAddPoint
@@ -49,6 +51,6 @@ int ClusterGetMinDistance(PCluster pCluster, PPoint pPoint);
 //* Parameters    : pCluster - a pointer to a cluster.
 //* Return value  : None.
 //*************************************************************************************
-void ClusterPrint(PCluster pCluster);
+void ClusterPrint(void* pCluster);
 
 #endif

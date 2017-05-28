@@ -1,13 +1,12 @@
 #include <stdio.h>
 #include "list.h"
+#include "point.h"
 
 PList ListCreate(CLONE_FUNC cloneFunc, DESTROY_FUNC destroyFunc, COMPARE_FUNC compareFunc, PRINT_FUNC printFunc)
 {
 	PList Plist = (PList)malloc(sizeof(List));
 	if (Plist != NULL)
 	{
-		Plist->iterator = NULL;
-//        sivan- changed this to also be Plist->iterator
 		Plist->head = NULL;
 		Plist->tail = NULL;
 		Plist->iterator = NULL;
@@ -38,13 +37,12 @@ void ListDestroy(PList list)
 Result ListAdd(PList list, void* added_object)
 {
 	PNode new_node = (PNode)malloc(sizeof(Node));
-	void* object = list->CloneFunc(new_object);
+	void* object = list->CloneFunc(added_object);
 	//if one of the alloc not succeeded
 	if (new_node == NULL || object == NULL)
 	{
-//		not sure you can free null maybe change this to two different if's //sivan
 		free(new_node);
-		free(object);
+		list->DestroyFunc(object); //omer
 		return FAIL;
 	}
 	//attaching the object to the node
@@ -76,7 +74,7 @@ Result ListRemove(PList list, void* object)
 	if (cur_object != NULL)
 	{
 		list->DestroyFunc(cur_object); 
-		
+		deleteNode(list, list->iterator);
 		return SUCCESS;
 	}
 	//If the object is not found
@@ -120,6 +118,7 @@ BOOL ListCompare(PList list1, PList list2)
 
 void ListPrint(PList list)
 {
+
 	void* cur_object = ListGetFirst(list);
 	while (cur_object !=NULL)
 	{
@@ -148,8 +147,22 @@ void deleteNode(PList list, Node* node)
 	if (cur_node->next == NULL)
 		list->tail = pre_node;
 	//if the iterator pointing to the node that going to be deleted
-	if (cur_node = list->iterator)
+	if (cur_node == list->iterator)
 		list->iterator = cur_node->next;
 	//free the node 
 	free(cur_node);
+}
+
+PList ListClone(PList origin_list)
+{
+	PList dup_list = ListCreate(CoordinateClone,CoordinateDestroy,CoordinateCompare,CoordinatePrint );
+	if (dup_list == NULL)
+		return NULL;
+	ListGetFirst(origin_list);
+	while (origin_list->iterator != NULL)
+	{
+		ListAdd(dup_list,((Node*)(origin_list->iterator))->Pobject);
+		ListGetNext(origin_list);
+	}
+	return dup_list;
 }

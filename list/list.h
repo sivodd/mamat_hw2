@@ -5,7 +5,6 @@
 #include "defs.h"
 
 
-
 //*type defintions*//
 typedef void* Pobject;
 
@@ -13,7 +12,7 @@ typedef void* Pobject;
 typedef void* (*CLONE_FUNC)(Pobject);
 typedef void (*DESTROY_FUNC)(Pobject);
 typedef BOOL (*COMPARE_FUNC)(Pobject, Pobject);
-typedef void* (*PRINT_FUNC)(Pobject);
+typedef void (*PRINT_FUNC)(Pobject);
 
 typedef struct Node {
 	void* Pobject;
@@ -39,5 +38,6 @@ void* ListGetNext(PList list);
 BOOL ListCompare(PList list1, PList list2);
 void ListPrint(PList list);
 void deleteNode(PList list, Node* node);
+PList ListClone(PList origin_list);
 
 #endif
