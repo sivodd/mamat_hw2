@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 #include "point.h"
 
 // i use this already in PointAddList not sure what it's good for
@@ -202,21 +201,24 @@ BOOL PointCompare(void* pPoint1, void* pPoint2){
 //*************************************************************************************
 
 int PointDistance(PPoint pPoint1, PPoint pPoint2){
-// ???maybe we should use a static here
-// ???make sure this function can't get empty points
+//what if this gets empty points?
 //  result will add up the distance between the two points for each coordinate
     int result=0;
     int size=0;
-//  ??? do we need to use coor_value=0??? coor_value=PointGetFirstCoordinate(pPoint1);
+    int point1_value=0;
+    int point2_value=0;
     if (pPoint1->size==0 || PointCompare(pPoint1,pPoint2))
         return 0; //if the point is empty will not get distance.
-    result=(int)pow((PointGetFirstCoordinate(pPoint1)-PointGetFirstCoordinate(pPoint2)),2);
+    point1_value=PointGetFirstCoordinate(pPoint1);
+    point2_value=PointGetFirstCoordinate(pPoint2);
+    result=(point1_value-point2_value)*(point1_value-point2_value);
     size=1;
 //  make sure we did'nt get to the end of the point
     while (size<pPoint1->size){
-        result+=(int)pow((PointGetNextCoordinate(pPoint1)-PointGetNextCoordinate(pPoint2)),2);
+        point1_value=PointGetNextCoordinate(pPoint1);
+        point2_value=PointGetNextCoordinate(pPoint2);
+        result+=(point1_value-point2_value)*(point1_value-point2_value);
         size++;
     }
-
     return result;
 }

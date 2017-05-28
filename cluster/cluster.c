@@ -1,7 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
-#include <limits.h>
 #include "cluster.h"
 
 //*************************************************************************************
@@ -19,7 +17,7 @@ PCluster ClusterCreate(int dimension){
     pCluster->point_list= ListCreate(PointClone, PointDestroy, PointCompare, PointPrint);
 	if (pCluster->point_list == NULL)
 	{
-		free(pCluster); //omer
+		free(pCluster);
 		return NULL;
 	}
     return pCluster;
@@ -67,7 +65,7 @@ Result ClusterAddPoint(PCluster pCluster, PPoint pPoint){
 //* Return value  : minimum distance - number.
 //*************************************************************************************
 int ClusterGetMinDistance(PCluster pCluster, PPoint pPoint){
-    int min_d=INT_MAX;
+    int min_d=2147483647;
     int d=0;
     PPoint pPoint_curr=ListGetFirst(pCluster->point_list);
 //  iterates on all points in cluster.
@@ -90,7 +88,7 @@ int ClusterGetMinDistance(PCluster pCluster, PPoint pPoint){
 //*************************************************************************************
 void ClusterPrint(void* pCluster){
 	PCluster c_pCluster = (PCluster)pCluster;
-    int MinSqDist=INT_MAX;
+    int MinSqDist=2147483647;
     int d=0;
     PPoint pPoint_curr=ListGetFirst(c_pCluster->point_list);
 //  iter_temp will save the pointer to the iterator before we use a function that will move the iterator so
@@ -111,7 +109,7 @@ void ClusterPrint(void* pCluster){
     printf("Cluster's dimension: %d\n", c_pCluster->dimension);
     ListPrint(c_pCluster->point_list);
     if (d==0){
-        printf("Minimum Square Distance: 0 (erase later -there is only one point or none)\n");
+        printf("1000 \n");
     }
     else printf("Minimum Square Distance: %d\n", MinSqDist);
 }
