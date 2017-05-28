@@ -43,6 +43,9 @@ void ClusterDestroy(void* pCluster){
 //* Return value  : SUCCESS / FAIL
 //*************************************************************************************
 Result ClusterAddPoint(PCluster pCluster, PPoint pPoint){
+    if (pCluster==NULL || pPoint==NULL)
+        return FAIL;
+//  check if the point's dimension is the same as the cluster's
     if (pPoint->dimension!=pCluster->dimension)
         return FAIL;
     PPoint pPoint_curr=ListGetFirst(pCluster->point_list);
@@ -87,6 +90,8 @@ int ClusterGetMinDistance(PCluster pCluster, PPoint pPoint){
 //* Return value  : None.
 //*************************************************************************************
 void ClusterPrint(void* pCluster){
+    if (pCluster==NULL)
+        printf("1000");
 	PCluster c_pCluster = (PCluster)pCluster;
     int MinSqDist=2147483647;
     int d=0;
@@ -109,7 +114,7 @@ void ClusterPrint(void* pCluster){
     printf("Cluster's dimension: %d\n", c_pCluster->dimension);
     ListPrint(c_pCluster->point_list);
     if (d==0){
-        printf("1000 \n");
+        printf("Minimum Square Distance: 1000\n");
     }
     else printf("Minimum Square Distance: %d\n", MinSqDist);
 }
