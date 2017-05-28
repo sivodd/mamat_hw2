@@ -2,8 +2,10 @@
 #include <stdlib.h>
 #include "point.h"
 
-// i use this already in PointAddList not sure what it's good for
+
  void* CoordinateClone(void* pCoordinate){
+    if (pCoordinate==NULL)
+        return NULL;
 	PCoordinate c_pCoordinate = (PCoordinate)pCoordinate;
     PCoordinate new_pCoordinate=(PCoordinate)malloc(sizeof(Coordinate));
     if (new_pCoordinate == NULL)
@@ -35,7 +37,9 @@ void CoordinateDestroy(void* pCoordinate){
 BOOL CoordinateCompare(void* pCoordinate1, void* pCoordinate2){
 	PCoordinate c_pCoordinate1 = (PCoordinate)pCoordinate1;
 	PCoordinate c_pCoordinate2 = (PCoordinate)pCoordinate2;
-	if (c_pCoordinate1->coordinate_value==c_pCoordinate2->coordinate_value)
+    if ((pCoordinate1==NULL || pCoordinate2==NULL) && pCoordinate1!=pCoordinate2)
+        return FALSE;
+	if ((pCoordinate1==NULL ) || (c_pCoordinate1->coordinate_value==c_pCoordinate2->coordinate_value))
         return TRUE;
     else return FALSE;
 }
@@ -47,8 +51,10 @@ BOOL CoordinateCompare(void* pCoordinate1, void* pCoordinate2){
 //* Return value  : None.
 //*************************************************************************************
 void CoordinatePrint(void* pCoordinate){
-	PCoordinate c_pCoordinate = (PCoordinate)pCoordinate;
-    printf("%d ", c_pCoordinate->coordinate_value);
+    if (pCoordinate!=NULL) {
+        PCoordinate c_pCoordinate = (PCoordinate) pCoordinate;
+        printf("%d ", c_pCoordinate->coordinate_value);
+    }
 }
 
 //*************************************************************************************
@@ -99,8 +105,10 @@ void PointDestroy(void* pPoint){
 //* Return value  : FAIL / SUCCESS.
 //*************************************************************************************
 Result PointAddCoordinate(PPoint pPoint, int coordinate){
-//  check if the point has the max amount of coordinates already
-	if (pPoint->size == pPoint->dimension)
+    if (pPoint==NULL)
+        return FAIL;
+// check if the point has the max amount of coordinates already
+    if (pPoint->size == pPoint->dimension)
 		return FAIL;
     PCoordinate pCoordinate=(PCoordinate)malloc(sizeof(Coordinate));
     if (pCoordinate==NULL)
@@ -126,6 +134,8 @@ Result PointAddCoordinate(PPoint pPoint, int coordinate){
 //* Return value  : coordinate value or 0 if there is no coordinate.
 //*************************************************************************************
 int PointGetFirstCoordinate(PPoint pPoint){
+    if (pPoint==NULL)
+        return 0;
     PCoordinate first=ListGetFirst(pPoint->coordinate_list);
 //  if the list function didn't find the first node return 0
     if (first==NULL)
@@ -141,6 +151,8 @@ int PointGetFirstCoordinate(PPoint pPoint){
 //* Return value  : coordinate value or 0 if there is no coordinate.
 //*************************************************************************************
 int PointGetNextCoordinate(PPoint pPoint){
+    if (pPoint==NULL)
+        return 0;
     PCoordinate next=ListGetNext(pPoint->coordinate_list);
     if (next==NULL)
         return 0;
@@ -154,11 +166,13 @@ int PointGetNextCoordinate(PPoint pPoint){
 //* Return value  : None.
 //*************************************************************************************
 void PointPrint(void* pPoint){
-	PPoint c_pPoint = (PPoint)pPoint;
-    int size=c_pPoint->size;
-    int dim=c_pPoint->dimension;
-    printf("Point Dimension: %d, Size: %d, Coordinates: ", dim ,size);
-    ListPrint(c_pPoint->coordinate_list);
+    if (pPoint!=NULL) {
+        PPoint c_pPoint = (PPoint) pPoint;
+        int size = c_pPoint->size;
+        int dim = c_pPoint->dimension;
+        printf("Point Dimension: %d, Size: %d, Coordinates: ", dim, size);
+        ListPrint(c_pPoint->coordinate_list);
+    }
 }
 //*************************************************************************************
 //* Function name : PointClone
@@ -167,6 +181,8 @@ void PointPrint(void* pPoint){
 //* Return value  : None.
 //*************************************************************************************
 void* PointClone(void* pPoint){
+    if (pPoint==NULL)
+        return NULL;
 	PPoint c_pPoint = (PPoint)pPoint;
     PPoint new_pPoint=(PPoint)malloc(sizeof(Point));
     if (new_pPoint == NULL)
@@ -186,6 +202,10 @@ void* PointClone(void* pPoint){
 //* Return value  : TRUE / FALSE.
 //*************************************************************************************
 BOOL PointCompare(void* pPoint1, void* pPoint2){
+    if (pPoint1==NULL && pPoint2==NULL)
+        return TRUE;
+    if ((pPoint1==NULL && pPoint2!=NULL) || (pPoint1!=NULL && pPoint2==NULL))
+        return FALSE;
 	PPoint c_pPoint1 = (PPoint)pPoint1;
 	PPoint c_pPoint2 = (PPoint)pPoint2;
     if (ListCompare(c_pPoint1->coordinate_list,c_pPoint2->coordinate_list))
@@ -201,13 +221,12 @@ BOOL PointCompare(void* pPoint1, void* pPoint2){
 //*************************************************************************************
 
 int PointDistance(PPoint pPoint1, PPoint pPoint2){
-//what if this gets empty points?
 //  result will add up the distance between the two points for each coordinate
     int result=0;
     int size=0;
     int point1_value=0;
     int point2_value=0;
-    if (pPoint1->size==0 || PointCompare(pPoint1,pPoint2))
+    if (PointCompare(pPoint1,pPoint2) || pPoint1->size==0)
         return 0; //if the point is empty will not get distance.
     point1_value=PointGetFirstCoordinate(pPoint1);
     point2_value=PointGetFirstCoordinate(pPoint2);
